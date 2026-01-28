@@ -16,8 +16,11 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Generate Prisma client
+# Generate Prisma client and initialize database for build
 RUN npx prisma generate
+RUN mkdir -p /app/data
+ENV DATABASE_URL="file:/app/data/build.db"
+RUN npx prisma migrate deploy
 
 # Build the application
 ENV NEXT_TELEMETRY_DISABLED=1
