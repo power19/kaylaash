@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  kaylaash:
+    build: .
+    container_name: kaylaash
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: file:/app/data/prod.db
+      AUTH_SECRET: ${AUTH_SECRET:-change-this-secret-in-production-min-32-chars}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
+      DEFAULT_EXCHANGE_RATE: ${DEFAULT_EXCHANGE_RATE:-35.5}
+    volumes:
+      - kaylaash-data:/app/data
+    ports:
+      - "3001:3000"
+    restart: unless-stopped
+
+volumes:
+  kaylaash-data:
