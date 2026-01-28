@@ -66,6 +66,9 @@ export function InvoiceForm({
   const [customerId, setCustomerId] = useState("");
   const [notes, setNotes] = useState("");
   const [dueDate, setDueDate] = useState("");
+  const [paymentTerms, setPaymentTerms] = useState("CASH/BANK");
+  const [discountPercent, setDiscountPercent] = useState(0);
+  const [taxRate, setTaxRate] = useState(0);
   const [items, setItems] = useState<LineItem[]>([]);
   const [selectedVariantId, setSelectedVariantId] = useState("");
 
@@ -111,6 +114,11 @@ export function InvoiceForm({
     0
   );
 
+  const discountAmount = subtotal * (discountPercent / 100);
+  const afterDiscount = subtotal - discountAmount;
+  const taxAmount = afterDiscount * (taxRate / 100);
+  const total = afterDiscount + taxAmount;
+
   const handleSubmit = async () => {
     if (!customerId) {
       toast.error("Please select a customer");
@@ -130,6 +138,9 @@ export function InvoiceForm({
           customerId,
           notes,
           dueDate: dueDate || null,
+          paymentTerms,
+          discountPercent,
+          taxRate,
           items: items.map((item) => ({
             variantId: item.variantId,
             quantity: item.quantity,
@@ -181,6 +192,24 @@ export function InvoiceForm({
                 </Select>
               </div>
               <div className="space-y-2">
+                <Label>Payment Terms</Label>
+                <Select value={paymentTerms} onValueChange={setPaymentTerms}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="CASH/BANK">CASH/BANK</SelectItem>
+                    <SelectItem value="CASH">CASH</SelectItem>
+                    <SelectItem value="BANK">BANK</SelectItem>
+                    <SelectItem value="NET 15">NET 15</SelectItem>
+                    <SelectItem value="NET 30">NET 30</SelectItem>
+                    <SelectItem value="NET 60">NET 60</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
                 <Label>Due Date</Label>
                 <Input
                   type="date"
@@ -188,14 +217,14 @@ export function InvoiceForm({
                   onChange={(e) => setDueDate(e.target.value)}
                 />
               </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Notes</Label>
-              <Input
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Additional notes for this invoice"
-              />
+              <div className="space-y-2">
+                <Label>Notes (appears on invoice)</Label>
+                <Input
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="e.g. PAID IN CASH"
+                />
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -310,6 +339,36 @@ export function InvoiceForm({
       <div className="space-y-6">
         <Card>
           <CardHeader>
+            <CardTitle>Discount & Tax</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>Discount (%)</Label>
+              <Input
+                type="number"
+                min="0"
+                max="100"
+                step="0.1"
+                value={discountPercent}
+                onChange={(e) => setDiscountPercent(parseFloat(e.target.value) || 0)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>BTW / Tax (%)</Label>
+              <Input
+                type="number"
+                min="0"
+                max="100"
+                step="0.1"
+                value={taxRate}
+                onChange={(e) => setTaxRate(parseFloat(e.target.value) || 0)}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
             <CardTitle>Summary</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -318,13 +377,27 @@ export function InvoiceForm({
                 <span>Subtotal (USD)</span>
                 <span className="font-medium">{formatUsd(subtotal)}</span>
               </div>
-              <div className="flex justify-between text-lg font-bold">
-                <span>Total (USD)</span>
-                <span>{formatUsd(subtotal)}</span>
-              </div>
-              <div className="flex justify-between text-lg font-bold text-blue-600">
-                <span>Total (SRD)</span>
-                <span>{formatSrd(convertUsdToSrd(subtotal, exchangeRate))}</span>
+              {discountPercent > 0 && (
+                <div className="flex justify-between text-green-600">
+                  <span>Discount ({discountPercent}%)</span>
+                  <span>-{formatUsd(discountAmount)}</span>
+                </div>
+              )}
+              {taxRate > 0 && (
+                <div className="flex justify-between">
+                  <span>BTW ({taxRate}%)</span>
+                  <span>{formatUsd(taxAmount)}</span>
+                </div>
+              )}
+              <div className="border-t pt-2">
+                <div className="flex justify-between text-lg font-bold">
+                  <span>Total (USD)</span>
+                  <span>{formatUsd(total)}</span>
+                </div>
+                <div className="flex justify-between text-lg font-bold text-blue-600">
+                  <span>Total (SRD)</span>
+                  <span>{formatSrd(convertUsdToSrd(total, exchangeRate))}</span>
+                </div>
               </div>
               <p className="text-xs text-muted-foreground">
                 Rate: $1 = {formatSrd(exchangeRate)}

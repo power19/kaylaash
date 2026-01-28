@@ -69,16 +69,28 @@ model StockMovement {
 }
 
 model Customer {
-  id          String    @id @default(cuid())
+  id           String    @id @default(cuid())
+  customerCode String?   @unique
+  name         String
+  companyName  String?
+  email        String?
+  phone        String?
+  address      String?
+  quotes       Quote[]
+  invoices     Invoice[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model CompanyInfo {
+  id          String  @id @default(cuid())
   name        String
-  companyName String?
-  email       String?
-  phone       String?
   address     String?
-  quotes      Quote[]
-  invoices    Invoice[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  phone       String?
+  bankName    String?
+  bankAccUsd  String?
+  bankAccSrd  String?
+  bankAccEur  String?
 }
 
 model ExchangeRate {
@@ -118,24 +130,27 @@ model QuoteItem {
 }
 
 model Invoice {
-  id            String        @id @default(cuid())
-  invoiceNumber String        @unique
-  customer      Customer      @relation(fields: [customerId], references: [id])
-  customerId    String
-  quote         Quote?        @relation(fields: [quoteId], references: [id])
-  quoteId       String?
-  exchangeRate  Float
-  items         InvoiceItem[]
-  subtotalUsd   Float
-  taxRate       Float         @default(0)
-  taxAmountUsd  Float         @default(0)
-  totalUsd      Float
-  status        String        @default("draft")
-  dueDate       DateTime?
-  paidDate      DateTime?
-  notes         String?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  id              String        @id @default(cuid())
+  invoiceNumber   String        @unique
+  customer        Customer      @relation(fields: [customerId], references: [id])
+  customerId      String
+  quote           Quote?        @relation(fields: [quoteId], references: [id])
+  quoteId         String?
+  exchangeRate    Float
+  items           InvoiceItem[]
+  subtotalUsd     Float
+  discountPercent Float         @default(0)
+  discountUsd     Float         @default(0)
+  taxRate         Float         @default(0)
+  taxAmountUsd    Float         @default(0)
+  totalUsd        Float
+  status          String        @default("draft")
+  paymentTerms    String        @default("CASH/BANK")
+  dueDate         DateTime?
+  paidDate        DateTime?
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 }
 
 model InvoiceItem {

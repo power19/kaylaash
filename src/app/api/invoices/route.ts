@@ -46,7 +46,15 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { customerId, items, notes, dueDate } = body;
+    const {
+      customerId,
+      items,
+      notes,
+      dueDate,
+      discountPercent = 0,
+      taxRate = 0,
+      paymentTerms = "CASH/BANK"
+    } = body;
 
     if (!customerId) {
       return NextResponse.json(
@@ -83,13 +91,26 @@ export async function POST(request: NextRequest) {
       0
     );
 
+    // Calculate discount
+    const discountUsd = subtotalUsd * (discountPercent / 100);
+    const afterDiscountUsd = subtotalUsd - discountUsd;
+
+    // Calculate tax (BTW)
+    const taxAmountUsd = afterDiscountUsd * (taxRate / 100);
+    const totalUsd = afterDiscountUsd + taxAmountUsd;
+
     const invoice = await prisma.invoice.create({
       data: {
         invoiceNumber,
         customerId,
         exchangeRate: exchangeRateRecord.rateUsdToSrd,
         subtotalUsd,
-        totalUsd: subtotalUsd,
+        discountPercent,
+        discountUsd,
+        taxRate,
+        taxAmountUsd,
+        totalUsd,
+        paymentTerms,
         notes: notes || null,
         dueDate: dueDate ? new Date(dueDate) : null,
         items: {
