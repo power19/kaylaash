@@ -12,9 +12,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Printer } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { formatUsd, formatSrd, convertUsdToSrd } from "@/lib/currency";
 import { QuoteActions } from "./quote-actions";
+import { PrintButton } from "@/components/shared/print-button";
 
 async function getQuote(id: string) {
   return prisma.quote.findUnique({
@@ -75,10 +76,7 @@ export default async function QuoteDetailPage({
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => window.print()}>
-            <Printer className="mr-2 h-4 w-4" />
-            Print
-          </Button>
+          <PrintButton />
           <QuoteActions quote={quote} />
         </div>
       </div>

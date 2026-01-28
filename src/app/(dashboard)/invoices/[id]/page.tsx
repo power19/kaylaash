@@ -12,9 +12,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Printer } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { formatUsd, formatSrd, convertUsdToSrd } from "@/lib/currency";
 import { InvoiceActions } from "./invoice-actions";
+import { PrintButton } from "@/components/shared/print-button";
 
 async function getInvoice(id: string) {
   return prisma.invoice.findUnique({
@@ -90,10 +91,7 @@ export default async function InvoiceDetailPage({
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => window.print()}>
-            <Printer className="mr-2 h-4 w-4" />
-            Print
-          </Button>
+          <PrintButton />
           <InvoiceActions invoice={invoice} />
         </div>
       </div>
