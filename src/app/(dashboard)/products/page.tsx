@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { ProductsClient } from "./products-client";
 
+export const dynamic = "force-dynamic";
+
 async function getProducts() {
   return prisma.product.findMany({
     orderBy: [{ brand: { name: "asc" } }, { name: "asc" }],

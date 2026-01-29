@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { InventoryClient } from "./inventory-client";
 
+export const dynamic = "force-dynamic";
+
 async function getInventory() {
   return prisma.productVariant.findMany({
     orderBy: [

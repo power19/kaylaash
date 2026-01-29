@@ -1,15 +1,22 @@
 import { prisma } from "@/lib/prisma";
 import { CustomersClient } from "./customers-client";
 
+export const dynamic = "force-dynamic";
+
 async function getCustomers() {
-  return prisma.customer.findMany({
-    orderBy: { name: "asc" },
-    include: {
-      _count: {
-        select: { quotes: true, invoices: true },
+  try {
+    return await prisma.customer.findMany({
+      orderBy: { name: "asc" },
+      include: {
+        _count: {
+          select: { quotes: true, invoices: true },
+        },
       },
-    },
-  });
+    });
+  } catch (error) {
+    console.error("Error fetching customers:", error);
+    return [];
+  }
 }
 
 export default async function CustomersPage() {

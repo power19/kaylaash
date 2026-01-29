@@ -13,6 +13,8 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Eye } from "lucide-react";
 import { formatUsd, formatSrd, convertUsdToSrd } from "@/lib/currency";
 
+export const dynamic = "force-dynamic";
+
 async function getQuotes() {
   return prisma.quote.findMany({
     orderBy: { createdAt: "desc" },
