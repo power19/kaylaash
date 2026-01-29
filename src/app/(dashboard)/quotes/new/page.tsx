@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { QuoteForm } from "../quote-form";
 
+export const dynamic = "force-dynamic";
+
 async function getCustomers() {
   return prisma.customer.findMany({
     orderBy: { name: "asc" },
