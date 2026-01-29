@@ -181,7 +181,7 @@ export function InvoiceForm({
                   <SelectTrigger>
                     <SelectValue placeholder="Select customer" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent position="popper" sideOffset={4}>
                     {customers.map((customer) => (
                       <SelectItem key={customer.id} value={customer.id}>
                         {customer.name}
@@ -197,7 +197,7 @@ export function InvoiceForm({
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent position="popper" sideOffset={4}>
                     <SelectItem value="CASH/BANK">CASH/BANK</SelectItem>
                     <SelectItem value="CASH">CASH</SelectItem>
                     <SelectItem value="BANK">BANK</SelectItem>
@@ -250,7 +250,7 @@ export function InvoiceForm({
                   <SelectTrigger className="flex-1">
                     <SelectValue placeholder="Select a product to add" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent position="popper" sideOffset={4}>
                     {availableVariants.map((variant) => (
                       <SelectItem key={variant.id} value={variant.id}>
                         {variant.product.brand.name} - {variant.product.name} ({variant.literVariation.label}) - {formatUsd(variant.priceUsd)} (Stock: {variant.stockQuantity})

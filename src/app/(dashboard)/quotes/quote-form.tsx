@@ -198,7 +198,7 @@ export function QuoteForm({
                   <SelectTrigger>
                     <SelectValue placeholder="Select customer" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent position="popper" sideOffset={4}>
                     {customers.map((customer) => (
                       <SelectItem key={customer.id} value={customer.id}>
                         {customer.name}
@@ -249,7 +249,7 @@ export function QuoteForm({
                   <SelectTrigger className="flex-1">
                     <SelectValue placeholder="Select a product to add" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent position="popper" sideOffset={4}>
                     {availableVariants.map((variant) => (
                       <SelectItem key={variant.id} value={variant.id}>
                         {variant.product.brand.name} - {variant.product.name} ({variant.literVariation.label}) - {formatUsd(variant.priceUsd)}
