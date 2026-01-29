@@ -11,9 +11,6 @@ async function getCustomers() {
 
 async function getProductVariants() {
   return prisma.productVariant.findMany({
-    where: {
-      stockQuantity: { gt: 0 },
-    },
     orderBy: [
       { product: { brand: { name: "asc" } } },
       { product: { name: "asc" } },
