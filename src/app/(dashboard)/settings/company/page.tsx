@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { CompanyForm } from "./company-form";
 
+export const dynamic = "force-dynamic";
+
 async function getCompanyInfo() {
   let company = await prisma.companyInfo.findFirst();
 

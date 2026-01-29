@@ -184,10 +184,10 @@ export default async function InvoiceDetailPage({
                     {item.quantity}
                   </td>
                   <td className="px-3 py-2 text-right border-b border-gray-200">
-                    <span className="text-gray-500">€</span> {unitPriceSrd.toFixed(2)}
+                    SRD {unitPriceSrd.toFixed(2)}
                   </td>
                   <td className="px-3 py-2 text-right border-b border-gray-200">
-                    <span className="text-gray-500">€</span> {amountSrd.toFixed(2)}
+                    SRD {amountSrd.toFixed(2)}
                   </td>
                 </tr>
               );
@@ -243,7 +243,7 @@ export default async function InvoiceDetailPage({
             {/* Total Box */}
             <div className="bg-[#1e3a5f] text-white flex items-center mt-4">
               <div className="px-4 py-3 font-bold text-lg">TOTAL</div>
-              <div className="px-4 py-3 font-bold text-lg">€</div>
+              <div className="px-4 py-3 font-bold text-lg">SRD</div>
               <div className="px-4 py-3 font-bold text-lg flex-1 text-right">
                 {totalSrd.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>

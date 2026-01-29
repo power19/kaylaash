@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
 
 interface CompanyInfo {
   id: string;
@@ -20,7 +20,6 @@ interface CompanyInfo {
 }
 
 export function CompanyForm({ company }: { company: CompanyInfo }) {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: company.name,
@@ -44,10 +43,13 @@ export function CompanyForm({ company }: { company: CompanyInfo }) {
       });
 
       if (res.ok) {
-        router.refresh();
+        toast.success("Company information saved successfully");
+      } else {
+        toast.error("Failed to save company information");
       }
     } catch (error) {
       console.error("Error updating company:", error);
+      toast.error("Failed to save company information");
     } finally {
       setLoading(false);
     }
