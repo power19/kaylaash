@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,15 +26,16 @@ type ExchangeRate = {
 };
 
 export function ExchangeRateClient({
-  currentRate,
-  history,
+  currentRate: initialCurrentRate,
+  history: initialHistory,
 }: {
   currentRate: ExchangeRate | null;
   history: ExchangeRate[];
 }) {
-  const router = useRouter();
+  const [currentRate, setCurrentRate] = useState(initialCurrentRate);
+  const [history, setHistory] = useState(initialHistory);
   const [newRate, setNewRate] = useState(
-    currentRate?.rateUsdToSrd.toString() || ""
+    initialCurrentRate?.rateUsdToSrd.toString() || ""
   );
   const [isLoading, setIsLoading] = useState(false);
 
@@ -59,8 +59,22 @@ export function ExchangeRateClient({
         throw new Error(data.error || "Failed to update exchange rate");
       }
 
+      const newRateData = await res.json();
+
+      // Update local state
+      const serializedRate: ExchangeRate = {
+        ...newRateData,
+        effectiveDate: new Date(newRateData.effectiveDate).toISOString(),
+        createdAt: new Date(newRateData.createdAt).toISOString(),
+      };
+
+      setCurrentRate(serializedRate);
+      setHistory((prev) => {
+        const updated = prev.map((r) => ({ ...r, isCurrent: false }));
+        return [serializedRate, ...updated].slice(0, 10);
+      });
+
       toast.success("Exchange rate updated successfully");
-      router.refresh();
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Failed to update exchange rate"

@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { LiterVariationsClient } from "./liter-variations-client";
 
+export const dynamic = "force-dynamic";
+
 async function getLiterVariations() {
   return prisma.literVariation.findMany({
     orderBy: { sizeInLiters: "asc" },

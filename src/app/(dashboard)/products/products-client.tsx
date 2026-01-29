@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -68,7 +67,7 @@ export function ProductsClient({
   brands: Brand[];
   literVariations: LiterVariation[];
 }) {
-  const router = useRouter();
+  const [products, setProducts] = useState(initialProducts);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [formData, setFormData] = useState({
@@ -106,10 +105,26 @@ export function ProductsClient({
         throw new Error(data.error || "Failed to create product");
       }
 
+      const newProduct = await res.json();
+      const brand = brands.find((b) => b.id === formData.brandId);
+      setProducts((prev) =>
+        [
+          ...prev,
+          {
+            ...newProduct,
+            brand: brand || { id: formData.brandId, name: "" },
+            variants: [],
+          },
+        ].sort((a, b) => {
+          const brandCompare = a.brand.name.localeCompare(b.brand.name);
+          if (brandCompare !== 0) return brandCompare;
+          return a.name.localeCompare(b.name);
+        })
+      );
+
       toast.success("Product created successfully");
       setIsAddOpen(false);
       resetForm();
-      router.refresh();
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Failed to create product"
@@ -143,10 +158,29 @@ export function ProductsClient({
         throw new Error(data.error || "Failed to update product");
       }
 
+      const updatedProduct = await res.json();
+      const brand = brands.find((b) => b.id === formData.brandId);
+      setProducts((prev) =>
+        prev
+          .map((p) =>
+            p.id === editingProduct.id
+              ? {
+                  ...updatedProduct,
+                  brand: brand || { id: formData.brandId, name: "" },
+                  variants: p.variants,
+                }
+              : p
+          )
+          .sort((a, b) => {
+            const brandCompare = a.brand.name.localeCompare(b.brand.name);
+            if (brandCompare !== 0) return brandCompare;
+            return a.name.localeCompare(b.name);
+          })
+      );
+
       toast.success("Product updated successfully");
       setEditingProduct(null);
       resetForm();
-      router.refresh();
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Failed to update product"
@@ -185,8 +219,8 @@ export function ProductsClient({
         throw new Error(data.error || "Failed to delete product");
       }
 
+      setProducts((prev) => prev.filter((p) => p.id !== product.id));
       toast.success("Product deleted successfully");
-      router.refresh();
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Failed to delete product"
@@ -348,7 +382,7 @@ export function ProductsClient({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {initialProducts.length === 0 ? (
+              {products.length === 0 ? (
                 <TableRow>
                   <TableCell
                     colSpan={5}
@@ -358,7 +392,7 @@ export function ProductsClient({
                   </TableCell>
                 </TableRow>
               ) : (
-                initialProducts.map((product) => {
+                products.map((product) => {
                   const prices = product.variants.map((v) => v.priceUsd);
                   const minPrice = prices.length > 0 ? Math.min(...prices) : 0;
                   const maxPrice = prices.length > 0 ? Math.max(...prices) : 0;

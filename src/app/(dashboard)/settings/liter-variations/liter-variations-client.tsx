@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -39,7 +38,7 @@ export function LiterVariationsClient({
 }: {
   initialVariations: LiterVariation[];
 }) {
-  const router = useRouter();
+  const [variations, setVariations] = useState(initialVariations);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingVariation, setEditingVariation] =
     useState<LiterVariation | null>(null);
@@ -83,10 +82,16 @@ export function LiterVariationsClient({
         throw new Error(data.error || "Failed to create liter variation");
       }
 
+      const newVariation = await res.json();
+      setVariations((prev) =>
+        [...prev, { ...newVariation, _count: { productVariants: 0 } }].sort(
+          (a, b) => a.sizeInLiters - b.sizeInLiters
+        )
+      );
+
       toast.success("Liter variation created successfully");
       setIsAddOpen(false);
       resetForm();
-      router.refresh();
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Failed to create liter variation"
@@ -126,10 +131,20 @@ export function LiterVariationsClient({
         throw new Error(data.error || "Failed to update liter variation");
       }
 
+      const updatedVariation = await res.json();
+      setVariations((prev) =>
+        prev
+          .map((v) =>
+            v.id === editingVariation.id
+              ? { ...updatedVariation, _count: v._count }
+              : v
+          )
+          .sort((a, b) => a.sizeInLiters - b.sizeInLiters)
+      );
+
       toast.success("Liter variation updated successfully");
       setEditingVariation(null);
       resetForm();
-      router.refresh();
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Failed to update liter variation"
@@ -161,8 +176,8 @@ export function LiterVariationsClient({
         throw new Error(data.error || "Failed to delete liter variation");
       }
 
+      setVariations((prev) => prev.filter((v) => v.id !== variation.id));
       toast.success("Liter variation deleted successfully");
-      router.refresh();
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Failed to delete liter variation"
@@ -300,7 +315,7 @@ export function LiterVariationsClient({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {initialVariations.length === 0 ? (
+            {variations.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={5}
@@ -310,7 +325,7 @@ export function LiterVariationsClient({
                 </TableCell>
               </TableRow>
             ) : (
-              initialVariations.map((variation) => (
+              variations.map((variation) => (
                 <TableRow key={variation.id}>
                   <TableCell className="font-medium">
                     {variation.label}
