@@ -233,30 +233,39 @@ export function QuoteForm({
             <CardTitle>Line Items</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex gap-2">
-              <Select
-                value={selectedVariantId}
-                onValueChange={setSelectedVariantId}
-              >
-                <SelectTrigger className="flex-1">
-                  <SelectValue placeholder="Select a product to add" />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableVariants.map((variant) => (
-                    <SelectItem key={variant.id} value={variant.id}>
-                      {variant.product.brand.name} - {variant.product.name} ({variant.literVariation.label}) - {formatUsd(variant.priceUsd)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button
-                onClick={addItem}
-                disabled={!selectedVariantId}
-                type="button"
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
-            </div>
+            {variants.length === 0 ? (
+              <div className="text-center py-4 text-muted-foreground border rounded-md">
+                <p>No product variants available.</p>
+                <p className="text-sm mt-1">
+                  Go to Products → click a product → Add Variant to create variants.
+                </p>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <Select
+                  value={selectedVariantId}
+                  onValueChange={setSelectedVariantId}
+                >
+                  <SelectTrigger className="flex-1">
+                    <SelectValue placeholder="Select a product to add" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableVariants.map((variant) => (
+                      <SelectItem key={variant.id} value={variant.id}>
+                        {variant.product.brand.name} - {variant.product.name} ({variant.literVariation.label}) - {formatUsd(variant.priceUsd)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  onClick={addItem}
+                  disabled={!selectedVariantId}
+                  type="button"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
 
             {items.length > 0 && (
               <Table>
