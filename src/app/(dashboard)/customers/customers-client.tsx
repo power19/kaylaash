@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -41,7 +40,7 @@ export function CustomersClient({
 }: {
   initialCustomers: Customer[];
 }) {
-  const router = useRouter();
+  const [customers, setCustomers] = useState(initialCustomers);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [formData, setFormData] = useState({
@@ -83,10 +82,11 @@ export function CustomersClient({
         throw new Error(data.error || "Failed to create customer");
       }
 
+      const newCustomer = await res.json();
+      setCustomers([...customers, { ...newCustomer, _count: { quotes: 0, invoices: 0 } }].sort((a, b) => a.name.localeCompare(b.name)));
       toast.success("Customer created successfully");
       setIsAddOpen(false);
       resetForm();
-      router.refresh();
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Failed to create customer"
@@ -115,10 +115,11 @@ export function CustomersClient({
         throw new Error(data.error || "Failed to update customer");
       }
 
+      const updatedCustomer = await res.json();
+      setCustomers(customers.map(c => c.id === editingCustomer.id ? { ...updatedCustomer, _count: c._count } : c).sort((a, b) => a.name.localeCompare(b.name)));
       toast.success("Customer updated successfully");
       setEditingCustomer(null);
       resetForm();
-      router.refresh();
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Failed to update customer"
@@ -150,8 +151,8 @@ export function CustomersClient({
         throw new Error(data.error || "Failed to delete customer");
       }
 
+      setCustomers(customers.filter(c => c.id !== customer.id));
       toast.success("Customer deleted successfully");
-      router.refresh();
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Failed to delete customer"
@@ -281,7 +282,7 @@ export function CustomersClient({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {initialCustomers.length === 0 ? (
+            {customers.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={6}
@@ -291,7 +292,7 @@ export function CustomersClient({
                 </TableCell>
               </TableRow>
             ) : (
-              initialCustomers.map((customer) => (
+              customers.map((customer) => (
                 <TableRow key={customer.id}>
                   <TableCell className="font-medium">{customer.name}</TableCell>
                   <TableCell className="text-muted-foreground">

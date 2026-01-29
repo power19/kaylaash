@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,7 +32,6 @@ type Brand = {
 };
 
 export function BrandsClient({ initialBrands }: { initialBrands: Brand[] }) {
-  const router = useRouter();
   const [brands, setBrands] = useState(initialBrands);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingBrand, setEditingBrand] = useState<Brand | null>(null);
@@ -64,10 +62,11 @@ export function BrandsClient({ initialBrands }: { initialBrands: Brand[] }) {
         throw new Error(data.error || "Failed to create brand");
       }
 
+      const newBrand = await res.json();
+      setBrands([...brands, { ...newBrand, _count: { products: 0 } }].sort((a, b) => a.name.localeCompare(b.name)));
       toast.success("Brand created successfully");
       setIsAddOpen(false);
       resetForm();
-      router.refresh();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to create brand");
     } finally {
@@ -94,10 +93,11 @@ export function BrandsClient({ initialBrands }: { initialBrands: Brand[] }) {
         throw new Error(data.error || "Failed to update brand");
       }
 
+      const updatedBrand = await res.json();
+      setBrands(brands.map(b => b.id === editingBrand.id ? { ...updatedBrand, _count: b._count } : b).sort((a, b) => a.name.localeCompare(b.name)));
       toast.success("Brand updated successfully");
       setEditingBrand(null);
       resetForm();
-      router.refresh();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to update brand");
     } finally {
@@ -127,8 +127,8 @@ export function BrandsClient({ initialBrands }: { initialBrands: Brand[] }) {
         throw new Error(data.error || "Failed to delete brand");
       }
 
+      setBrands(brands.filter(b => b.id !== brand.id));
       toast.success("Brand deleted successfully");
-      router.refresh();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to delete brand");
     }
