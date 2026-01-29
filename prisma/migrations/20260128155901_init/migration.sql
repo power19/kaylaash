@@ -57,6 +57,7 @@ CREATE TABLE "StockMovement" (
 -- CreateTable
 CREATE TABLE "Customer" (
     "id" TEXT NOT NULL PRIMARY KEY,
+    "customerCode" TEXT,
     "name" TEXT NOT NULL,
     "companyName" TEXT,
     "email" TEXT,
@@ -64,6 +65,18 @@ CREATE TABLE "Customer" (
     "address" TEXT,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "CompanyInfo" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "name" TEXT NOT NULL,
+    "address" TEXT,
+    "phone" TEXT,
+    "bankName" TEXT,
+    "bankAccUsd" TEXT,
+    "bankAccSrd" TEXT,
+    "bankAccEur" TEXT
 );
 
 -- CreateTable
@@ -111,10 +124,13 @@ CREATE TABLE "Invoice" (
     "quoteId" TEXT,
     "exchangeRate" REAL NOT NULL,
     "subtotalUsd" REAL NOT NULL,
+    "discountPercent" REAL NOT NULL DEFAULT 0,
+    "discountUsd" REAL NOT NULL DEFAULT 0,
     "taxRate" REAL NOT NULL DEFAULT 0,
     "taxAmountUsd" REAL NOT NULL DEFAULT 0,
     "totalUsd" REAL NOT NULL,
     "status" TEXT NOT NULL DEFAULT 'draft',
+    "paymentTerms" TEXT NOT NULL DEFAULT 'CASH/BANK',
     "dueDate" DATETIME,
     "paidDate" DATETIME,
     "notes" TEXT,
@@ -167,3 +183,6 @@ CREATE UNIQUE INDEX "Invoice_invoiceNumber_key" ON "Invoice"("invoiceNumber");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Setting_key_key" ON "Setting"("key");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Customer_customerCode_key" ON "Customer"("customerCode");
