@@ -170,7 +170,7 @@ export function CustomersClient({
     });
   };
 
-  const FormFields = () => (
+  const formFields = (
     <>
       <div className="space-y-2">
         <Label htmlFor="name">Name *</Label>
@@ -239,7 +239,7 @@ export function CustomersClient({
             <DialogTitle>Add New Customer</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <FormFields />
+            {formFields}
             <Button onClick={handleAdd} disabled={isLoading} className="w-full">
               {isLoading ? "Creating..." : "Create Customer"}
             </Button>
@@ -256,7 +256,7 @@ export function CustomersClient({
             <DialogTitle>Edit Customer</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <FormFields />
+            {formFields}
             <Button
               onClick={handleEdit}
               disabled={isLoading}
