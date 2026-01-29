@@ -10,10 +10,11 @@ export function formatUsd(amount: number): string {
 }
 
 export function formatSrd(amount: number): string {
-  return new Intl.NumberFormat("nl-SR", {
-    style: "currency",
-    currency: "SRD",
-  }).format(amount);
+  // Use custom formatting since SRD isn't well supported in Intl.NumberFormat
+  return `SRD ${new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount)}`;
 }
 
 export function formatCurrency(
