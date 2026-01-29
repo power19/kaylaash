@@ -1,15 +1,22 @@
 import { prisma } from "@/lib/prisma";
 import { BrandsClient } from "./brands-client";
 
+export const dynamic = "force-dynamic";
+
 async function getBrands() {
-  return prisma.brand.findMany({
-    orderBy: { name: "asc" },
-    include: {
-      _count: {
-        select: { products: true },
+  try {
+    return await prisma.brand.findMany({
+      orderBy: { name: "asc" },
+      include: {
+        _count: {
+          select: { products: true },
+        },
       },
-    },
-  });
+    });
+  } catch (error) {
+    console.error("Error fetching brands:", error);
+    return [];
+  }
 }
 
 export default async function BrandsPage() {
